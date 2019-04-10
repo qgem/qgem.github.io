@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="msapplication-tap-highlight" content="no" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!--<meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; media-src *" />-->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#fff028">
+  <title>gemspider-gas</title>
+  <link rel="stylesheet" href="libs/framework7/css/framework7.min.css">
+  <link rel="stylesheet" href="libs/mapbox-gl/mapbox-gl.css">
+  <link rel="stylesheet" href="assets/css/icons.css">
+  <link rel="stylesheet" href="assets/css/addtohomescreen.css">
+  <link rel="stylesheet" href="assets/css/app.css">
+  
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="assets/icons/icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="assets/icons/icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="assets/icons/icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="assets/icons/icon-167x167.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/icon-180x180.png">
+  <link rel="icon" sizes="196x196" href="assets/icons/icon-196x196.png">
+  <link rel="icon" type="image/x-icon" href="assets/icons/favicon.ico">
+
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="gemspider">
+  <link href="assets/splash/apple_splash_320.png" rel="apple-touch-startup-image">
+  <link href="assets/splash/apple_splash_2048.png" sizes="2048x2732" rel="apple-touch-startup-image" />
+  <link href="assets/splash/apple_splash_1668.png" sizes="1668x2224" rel="apple-touch-startup-image" />
+  <link href="assets/splash/apple_splash_1536.png" sizes="1536x2048" rel="apple-touch-startup-image" />
+  <link href="assets/splash/apple_splash_1125.png" sizes="1125x2436" rel="apple-touch-startup-image" />
+  <link href="assets/splash/apple_splash_1242.png" sizes="1242x2208" rel="apple-touch-startup-image" />
+  <link href="assets/splash/apple_splash_750.png" sizes="750x1334" rel="apple-touch-startup-image" />
+  <link href="assets/splash/apple_splash_640.png" sizes="640x1136" rel="apple-touch-startup-image" />
+  
+  <script src="assets/js/addtohomescreen.min.js"></script>
+
+    
+</head>
+<body class="color-theme-yellow" >
+  <div id="app" v-cloak>
+    <f7-app :params="f7params">
+      <f7-statusbar></f7-statusbar>
+      <!-- Left Panel -->
+      <f7-panel left reveal >
+        <f7-view id="left-panel-view">
+          <f7-page>
+            <f7-navbar title="Legende"></f7-navbar>
+            <f7-block-title>Netze</f7-block-title>
+            <f7-list>
+              <f7-list-item checkbox title="Fernwärme" name="vector-fernwaerme" :checked="vectorLayers.fernwaerme" @change="vectorLayers.fernwaerme = $event.target.checked"></f7-list-item>
+              <f7-list-item checkbox title="Beleuchtung" name="vector-beleuchtung" :checked="vectorLayers.beleuchtung" @change="vectorLayers.beleuchtung = $event.target.checked"></f7-list-item>
+              <f7-list-item checkbox title="Wasser" name="vector-wasser" :checked="vectorLayers.wasser" @change="vectorLayers.wasser = $event.target.checked"></f7-list-item>
+              <f7-list-item checkbox title="Kanal" name="vector-kanal" :checked="vectorLayers.kanal" @change="vectorLayers.kanal = $event.target.checked"></f7-list-item>
+              <f7-list-item checkbox title="3D Gebäude" name="vector-buildings" :checked="vectorLayers.buildings" @change="vectorLayers.buildings = $event.target.checked"></f7-list-item>
+              <f7-list-item checkbox title="DKM" name="vector-dkm" :checked="vectorLayers.dkm" @change="vectorLayers.dkm = $event.target.checked"></f7-list-item>
+            </f7-list>
+            <f7-block-title>Base Maps</f7-block-title>
+            <f7-list>
+              <f7-list-item radio title="Orthophoto" name="basemap-ortho" :checked="baseMap === 'basemap-ortho'" @change="baseMap = $event.target.name"></f7-list-item>
+              <f7-list-item radio title="Basemap" name="basemap-normal" :checked="baseMap === 'basemap-normal'" @change="baseMap = $event.target.name"></f7-list-item>
+            </f7-list>
+            <f7-block-title>Darstellung</f7-block-title>
+            <f7-list>
+              <f7-list-item radio title="2D" name="2D" :checked="pitch === 0" @change="changePitch(0)"></f7-list-item>
+              <f7-list-item radio title="3D" name="3D" :checked="pitch !== 0" @change="changePitch(60)"></f7-list-item>
+            </f7-list>
+          </f7-page>
+        </f7-view>
+      </f7-panel>
+
+      <!-- Main View -->
+      <f7-view id="main-view" main>
+        <f7-page>
+          <f7-navbar>
+            <f7-nav-left>
+              <f7-link icon-if-ios="f7:menu" icon-if-md="material:menu" panel-open="left"></f7-link>
+            </f7-nav-left>
+            <f7-nav-title>gemspider-gas</f7-nav-title>
+          </f7-navbar>
+          <div id="map" class="no-fastclick" ></div>
+        </f7-page>
+      </f7-view>
+
+      <!-- Popup -->
+      <f7-popup id="sichtkontrolle">
+        <f7-view>
+          <f7-page>
+            <f7-navbar :title="'Sichtkontrolle Knoten ' + selectedElement.properties.Anlagennr">
+              <f7-nav-right>
+                <f7-link  @click="addMarker()" popup-close icon-ios="f7:check" icon-md="material:done" ></f7-link>
+              </f7-nav-right>
+            </f7-navbar>
+            <f7-toolbar tabbar labels :bottom-md="true" >
+              <f7-link tab-link="#tab-1" tab-link-active text="Allgemein" icon-ios="f7:menu" icon-md="material:description"></f7-link>
+              <f7-link tab-link="#tab-2" text="Beobachtungen" icon-ios="f7:eye_fill" icon-md="material:search"></f7-link>
+              <f7-link tab-link="#tab-3" text="Tätigkeiten" icon-ios="f7:gear_fill" icon-md="material:apps"></f7-link>
+              <f7-link tab-link="#tab-4" text="Foto" icon-ios="f7:camera_fill" icon-md="material:photo_camera"></f7-link>
+            </f7-toolbar>
+
+            <f7-tabs>
+              <f7-tab id="tab-1" class="page-content" tab-active style="padding-top: 10px;">
+                <f7-block>
+                <f7-block-title>Allgemein</f7-block-title>
+                <f7-list no-hairlines-md>
+                  <f7-list-item>
+                    <f7-label>Datum</f7-label>
+                    <f7-input type="date" value="2018-09-30" placeholder="Auswählen..."></f7-input>
+                  </f7-list-item>
+                  <f7-list-item>
+                    <f7-label>Status</f7-label>
+                    <f7-input type="select" placeholder="Auswählen..." value="0">
+                      <option value="0">in Bearbeitung</option>
+                      <option value="1">fertig</option>
+                    </f7-input>
+                  </f7-list-item>
+                  <f7-list-item>
+                    <f7-label>Wetter</f7-label>
+                    <f7-input type="select" placeholder="Auswählen..." value="0">
+                      <option value="0">sonnig</option>
+                      <option value="1">bewölkt</option>
+                      <option value="1">Niederschlag</option>                      
+                    </f7-input>
+                  </f7-list-item>                
+                  <f7-list-item>
+                    <f7-label>Anmerkungen</f7-label>
+                    <f7-input type="textarea" resizable placeholder="Anmerkungen"></f7-input>
+                  </f7-list-item>
+                </f7-list>
+              </f7-tab>
+              <f7-tab id="tab-2" class="page-content" style="padding-top: 10px;">
+                <f7-block>
+                <f7-block-title>Beobachtungen</f7-block-title>
+                <f7-list no-hairlines-md >
+                  <f7-list-item>
+                    <span>Hinweisschild OK</span><f7-toggle></f7-toggle>
+                  </f7-list-item>
+                  <f7-list-item>
+                    <span>Gaszähler OK</span><f7-toggle></f7-toggle>
+                  </f7-list-item>
+                  <f7-list-item>
+                    <span>Druckreduzierer OK</span><f7-toggle></f7-toggle>
+                  </f7-list-item>
+                  <f7-list-item>
+                    <span>Gasdruckregelanlage OK</span><f7-toggle></f7-toggle>
+                  </f7-list-item>
+                  <f7-list-item>
+                    <span>Messanlage OK</span><f7-toggle></f7-toggle>
+                  </f7-list-item>                  
+                </f7-list>
+              </f7-tab>
+              <f7-tab id="tab-3" class="page-content" style="padding-top: 10px;">
+                <f7-block>
+                <f7-block-title>Tätigkeiten</f7-block-title>
+                <f7-list no-hairlines-md >
+                  <f7-list-item>
+                    <span>Schieberfunktion</span><f7-toggle></f7-toggle>
+                  </f7-list-item>
+                  <f7-list-item>
+                    <span>Eingangsdruck</span><f7-toggle></f7-toggle>
+                  </f7-list-item>
+                  <f7-list-item>
+                    <span>Funktionsprüfung</span><f7-toggle></f7-toggle>
+                  </f7-list-item>
+
+                </f7-list>
+                </f7-block>
+              </f7-tab>
+              <f7-tab id="tab-4" class="page-content" style="padding-top: 10px;">
+                <f7-block>
+                <f7-block-title>Foto</f7-block-title>
+                  <f7-card v-if="file" >
+                    <f7-card-content class="alignCenter" @taphold.native="onTapHold" >
+                      <img class="imagePreview" v-bind:src="imagePreview" v-show="showPreview" widht="100%" />
+                    </f7-card-content>
+                  </f7-card>
+                  <div class="float" >
+                    <label for="fileInputCamera" >
+                      <f7-icon size="40px" ios="f7:camera_fill" md="material:photo_camera" style="top:8px;left:2px;"></f7-icon>
+                    </label>
+                    <input type="file" accept="image/*" multiple capture="camera" id="fileInputCamera" ref="file" style="visibility:hidden;width:0px" v-on:change="handleFileUpload('fileCamera')" />
+                  </div>
+                </f7-block>
+              </f7-tab>
+            </f7-tabs>
+          </f7-page>
+        </f7-view>
+      </f7-popup>
+    </f7-app>
+  </div>
+  <script src="libs/framework7/js/framework7.min.js"></script>
+  <script src="libs/vue/vue.min.js"></script>
+  <script src="libs/framework7-vue/framework7-vue.min.js"></script>
+  <script src="libs/mapbox-gl/mapbox-gl.js"></script>
+  <script src="assets/js/app.js"></script>
+
+  <script>
+    var sw_verion = '001'
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js?v' + sw_verion, {
+            scope: '.' // <--- THIS BIT IS REQUIRED
+        }).then(function(registration) {
+            // Registration was successful
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }, function(err) {
+            // registration failed :(
+            console.log('ServiceWorker registration failed: ', err);
+        });
+    }
+  </script>
+  <script>
+    var isIos = function isIos() {
+      var userAgent = window.navigator.userAgent.toLowerCase();
+      return (/iphone|ipad|ipod/.test(userAgent)
+      );
+    };
+    // Detects if device is in standalone mode
+    var isInStandaloneMode = function isInStandaloneMode() {
+      return 'standalone' in window.navigator && window.navigator.standalone;
+    };
+    
+    // Checks if should display install popup notification:
+    if (isIos() && !isInStandaloneMode()) {
+      localStorage.removeItem('org.cubiq.addtohome');
+      addToHomescreen({
+        icon: true,
+	      message: 'Sie können diese WebApp permanent zum Home-Bildschirm hinzufügen: Drücken sie <span class="ath-action-icon">icon</span> und danach <strong>Zum Home-Bildschirm</strong> hinzufügen.',
+        startDelay: 1,
+        maxDisplayCount: 2
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,200 @@
+{
+	"version": 8,
+	"id": "basemap-ortho",
+	"name": "Basemap Ortho",
+	"sources": {
+		"basemap-ortho": {
+			"type": "raster",
+			"tiles": ["https://maps1.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/{z}/{y}/{x}.jpeg", "https://maps2.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/{z}/{y}/{x}.jpeg", "https://maps3.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/{z}/{y}/{x}.jpeg"],
+			"tileSize": 256,
+			"maxzoom": 19
+		},
+		"basemap-normal": {
+			"type": "raster",
+      "tiles": ["https://maps1.wien.gv.at/basemap/geolandbasemap/normal/google3857/{z}/{y}/{x}.png", "https://maps2.wien.gv.at/basemap/geolandbasemap/normal/google3857/{z}/{y}/{x}.png", "https://maps3.wien.gv.at/basemap/geolandbasemap/normal/google3857/{z}/{y}/{x}.png"],
+			"tileSize": 256,
+			"maxzoom": 19
+		},
+		"gas_leitung": {
+			"type": "geojson",
+			"data": "./data/gas_leitung.geojson"
+		},
+		"gas_knoten": {
+			"type": "geojson",
+			"data": "./data/gas_knoten.geojson"
+		},
+		"beleuchtung_leitung": {
+			"type": "geojson",
+			"data": "./data/beleuchtung_leitung.geojson"
+		},
+		"beleuchtung_knoten": {
+			"type": "geojson",
+			"data": "./data/beleuchtung_knoten.geojson"
+		},
+		"fernwaerme_leitung": {
+			"type": "geojson",
+			"data": "./data/fernwaerme_leitung.geojson"
+		},
+		"fernwaerme_knoten": {
+			"type": "geojson",
+			"data": "./data/fernwaerme_knoten.geojson"
+		},
+		"kanal_leitung": {
+			"type": "geojson",
+			"data": "./data/kanal_leitung.geojson"
+		},
+		"kanal_knoten": {
+			"type": "geojson",
+			"data": "./data/kanal_knoten.geojson"
+		},
+		"wasser_leitung": {
+			"type": "geojson",
+			"data": "./data/wasser_leitung.geojson"
+		},
+		"wasser_knoten": {
+			"type": "geojson",
+			"data": "./data/wasser_knoten.geojson"
+		}
+	},
+	"layers": [{
+			"id": "basemap-ortho",
+			"type": "raster",
+			"source": "basemap-ortho",
+			"minzoom": 0,
+			"maxzoom": 24,
+			"layout": {
+				"visibility": "none"
+			},
+			"interactive": true
+		},
+		{
+			"id": "basemap-normal",
+			"type": "raster",
+			"source": "basemap-normal",
+			"minzoom": 0,
+			"maxzoom": 24,
+			"layout": {
+				"visibility": "visible"
+			},
+			"interactive": true
+		},
+		{
+			"id": "gas_leitung",
+			"type": "line",
+			"source": "gas_leitung",
+			"line-cap": "round",
+			"layout": {
+				"line-cap": "square",
+				"line-join": "bevel"
+			},
+			"paint": {
+				"line-width": 6,
+				"line-color": "yellow"
+			},
+			"minzoom": 5
+		},
+		{
+			"id": "gas_knoten",
+			"type": "circle",
+			"source": "gas_knoten",
+			"paint": {
+				"circle-radius": {
+					"stops": [
+						[8, 1],
+						[11, 3],
+						[16, 6]
+					]
+				},
+				"circle-color": "white",
+				"circle-opacity": 0.75,
+				"circle-stroke-width": 3,
+				"circle-stroke-color": "blue"
+			},
+			"minzoom": 11
+		},
+		{
+			"id": "gas_label",
+			"type": "symbol",
+			"source": "gas_knoten",
+			"layout": {
+				"symbol-placement": "point",
+				"text-anchor": "bottom-left",
+				"text-offset": [0.5, -0.5],
+				"text-font": ["Open Sans Regular"],
+				"text-field": "{Anlagennr}",
+				"text-size": 16
+			},
+			"paint": {
+				"text-color": "black",
+				"text-halo-color": "white",
+				"text-halo-width": 2
+			},
+			"minzoom": 15
+		},
+		{
+			"id": "beleuchtung",
+			"type": "line",
+			"source": "beleuchtung_leitung",
+			"line-cap": "round",
+			"layout": {
+				"line-cap": "square",
+				"line-join": "bevel",
+				"visibility": "none"
+			},
+			"paint": {
+				"line-width": 3,
+				"line-color": "green"
+			},
+			"minzoom": 10
+		},
+		{
+			"id": "fernwaerme",
+			"type": "line",
+			"source": "fernwaerme_leitung",
+			"line-cap": "round",
+			"layout": {
+				"line-cap": "square",
+				"line-join": "bevel",
+				"visibility": "none"
+			},
+			"paint": {
+				"line-width": 3,
+				"line-color": "#FF00FF"
+			},
+			"minzoom": 10
+		},
+		{
+			"id": "wasser",
+			"type": "line",
+			"source": "wasser_leitung",
+			"line-cap": "round",
+			"layout": {
+				"line-cap": "square",
+				"line-join": "bevel",
+				"visibility": "none"
+			},
+			"paint": {
+				"line-width": 3,
+				"line-color": "blue"
+			},
+			"minzoom": 10
+		},
+		{
+			"id": "kanal",
+			"type": "line",
+			"source": "kanal_leitung",
+			"line-cap": "round",
+			"layout": {
+				"line-cap": "square",
+				"line-join": "bevel",
+				"visibility": "none"
+			},
+			"paint": {
+				"line-width": 3,
+				"line-color": "brown"
+			},
+			"minzoom": 10
+		}
+	],
+	"glyphs": "https://dev.igutech.com/services/tile-styles/assets/glyphs/{fontstack}/{range}.pbf"
+}
